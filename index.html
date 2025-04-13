@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlgoWhiz - Algorithm Explainer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-purple-50 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-purple-600 p-6 shadow-md">
+        <h1 class="text-3xl font-bold text-center text-white">AlgoWhiz: Smart Algorithm Explainer</h1>
+        <p class="text-center text-white mt-2">Simplify any algorithm. Learn smart, learn fast.</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col items-center p-8">
+        
+        <!-- Form Card -->
+        <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-3xl border-2 border-purple-100">
+            <form id="algoForm" class="space-y-6">
+                <div>
+                    <label class="block text-lg font-medium text-purple-900">Algorithm Name</label>
+                    <input type="text" id="algorithmName" placeholder="e.g., Dijkstra's Algorithm" 
+                           class="mt-2 w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 bg-purple-50">
+                </div>
+
+                <div>
+                    <label class="block text-lg font-medium text-purple-900">Your Knowledge Level</label>
+                    <select id="userLevel" class="mt-2 w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 bg-purple-50">
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-lg font-medium text-purple-900">Programming Language</label>
+                    <select id="language" class="mt-2 w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 bg-purple-50">
+                        <option value="Python">Python</option>
+                        <option value="JavaScript">JavaScript</option>
+                        <option value="Java">Java</option>
+                    </select>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-2xl shadow-md transition-all duration-300">
+                        Explain Algorithm
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Output Card -->
+        <div id="resultArea" class="hidden mt-10 w-full max-w-4xl p-8 bg-purple-50 border-2 border-purple-100 rounded-2xl shadow-md">
+            <h2 class="text-2xl font-bold text-purple-900 mb-4">Explanation:</h2>
+            <div id="output" class="space-y-4 text-purple-800 text-lg">
+                <!-- Dynamic Output Goes Here -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-purple-600 text-center text-white p-4">
+        &copy; 2025 AlgoWhiz. Made with ❤️ using AI.
+    </footer>
+
+    <!-- Script to handle form -->
+    <script>
+        const form = document.getElementById('algoForm');
+        const resultArea = document.getElementById('resultArea');
+        const output = document.getElementById('output');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+        
+            const algorithmName = document.getElementById('algorithmName').value;
+            const userLevel = document.getElementById('userLevel').value;
+            const language = document.getElementById('language').value;
+        
+            try {
+                const response = await fetch('/explain', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        algorithmName: algorithmName,
+                        userLevel: userLevel,
+                        language: language
+                    })
+                });
+        
+                const data = await response.json();
+        
+                // Handling success response
+                if (response.ok) {
+                    output.innerHTML = `
+                        <p><strong>Algorithm:</strong> ${data.Algorithm}</p>
+                        <p><strong>Level:</strong> ${data.Level}</p>
+                        <p><strong>Step-by-step:</strong> ${data["Step-by-step"]}</p>
+                        <p><strong>Pseudocode:</strong><pre>${data.Pseudocode}</pre></p>
+                        <p><strong>Time Complexity:</strong> ${data["Time Complexity"]}</p>
+                        <p><strong>Real-World Example:</strong> ${data["Real-World Example"]}</p>
+                        <p><strong>Code in ${language}:</strong><pre>${data.Code}</pre></p>
+                    `;
+                } else {
+                    output.innerHTML = `<p class="text-red-500">Error: ${data.error}</p>`;
+                }
+        
+                resultArea.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error:', error);
+                output.innerHTML = `<p class="text-red-500">Something went wrong. Please try again later.</p>`;
+                resultArea.classList.remove('hidden');
+            }
+        });
+    </script>
+    
+</body>
+</html>
